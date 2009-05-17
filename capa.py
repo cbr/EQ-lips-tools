@@ -5,7 +5,11 @@ import sys
 import getopt
 import os.path
 
-def tranformValue(value, extension):
+inventoryFile="capa.txt"
+nbIter=2
+
+
+def tranformValue(val, extension):
     extension=extension.lower()
     if extension=="f":
         value=val
@@ -20,6 +24,7 @@ def tranformValue(value, extension):
     else:
         raise InputError, "extension error"
 
+
     return value
 
 def parseString(st):
@@ -27,30 +32,34 @@ def parseString(st):
     ext = re.search(r"[a-zA-Z]+", st).group(0)
     return val, ext
 
-def calculate(listIndex):
+# Calculate value by adding value of given index
+def calculate(listIndex, capa_col):
     res=0
     for i in range(0, len(listIndex)):
         if listIndex[i] != -1:
-            res += col[listIndex[i]][0]
+            res += capa_col[listIndex[i]][0]
     return res
 
-def iterate(iterNum, listIndex):
-    global result
-    global targetValue
+def iterate(targetValue, iterNum, bestListIndex, currentListIndex, capa_col):
     global nbIter
+
     if iterNum == nbIter:
-        current = calculate(result)
-        new = calculate(listIndex)
+        current = calculate(bestListIndex, capa_col)
+        new = calculate(currentListIndex, capa_col)
         if (math.fabs(targetValue-new) < math.fabs(targetValue-current)):
-            result = list(listIndex)
+            bestListIndex = list(currentListIndex)
     else:
-        listIndex[iterNum] = -1
-        iterate(iterNum + 1, listIndex)
-        for i in range(0, count):
-            listIndex[iterNum] = i
-            iterate(iterNum + 1, listIndex)
+        currentListIndex[iterNum] = -1
+        bestListIndex = iterate(targetValue, iterNum + 1, bestListIndex, currentListIndex, capa_col)
+        for i in range(0, len(capa_col)):
+            currentListIndex[iterNum] = i
+            bestListIndex = iterate(targetValue, iterNum + 1, bestListIndex, currentListIndex, capa_col)
+
+    return bestListIndex
 
 def usage():
+    global nbIter
+    global inventoryFile
     print "Usage:"
     print "%s [options] target_value" % os.path.basename(sys.argv[0])
     print "options:"
@@ -61,81 +70,95 @@ def usage():
 
     return
 
-inventoryFile="capa.txt"
-targetValueSt=""
+def openCollection(inventoryFile):
+    try:
+        f = open(inventoryFile);
+    except:
+        print "Error while opening file %s" %inventoryFile
+        sys.exit(-1)
 
-nbIter=2
+    line_num = 0
+    capa_col = []
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "hn:i:", ["help", "number=", "inventory="])
-except getopt.GetoptError:
-    usage()
-    sys.exit(2)
-for opt, arg in opts:
-    if opt in ("-h", "--help"):
+    for line in f:
+        line_num += 1
+        try:
+            val, ext = parseString(line)
+            valFarad = tranformValue(val, ext)
+            capa_col.append((valFarad, "%f %s"%(val,ext)))
+        except:
+            print"error while parsing line %d" % line_num
+
+    return capa_col
+
+
+def getAssociation(targetValue, capa_col):
+    result = [-1] * nbIter
+    tmpCur = list(result)
+    result = iterate(targetValue, 0, result, tmpCur, capa_col)
+    return result
+
+def smartPrint(value, ext):
+    stRes=""
+    if value >= 1:
+        stRes = "%f %s"%(value, ext)
+    elif value >= 0.001:
+        stRes = "%f m%s"%(value*1000, ext)
+    elif value >= 0.000001:
+        stRes = "%f u%s"%(value*1000000, ext)
+    elif value >= 0.000000001:
+        stRes = "%0.3f n%s"%(value*1000000000, ext)
+    elif value >= 0.000000000001:
+        stRes = "%f p%s"%(value*1000000000000, ext)
+    return stRes
+
+def main():
+    global inventoryFile
+    global nbIter
+
+    # Check parameters
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hn:i:", ["help", "number=", "inventory="])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif opt in ("-n", "--number"):
+            nbIter = int(arg)
+        elif opt in ("-i", "--inventory"):
+            inventoryFile = arg
+    if len(args) == 1 :
+        targetValueSt = args[0]
+    else:
         usage()
         sys.exit()
-    elif opt in ("-n", "--number"):
-        nbIter = int(arg)
-    elif opt in ("-i", "--inventory"):
-        inventoryFile = arg
-if len(args) == 1 :
-    targetValueSt = args[0]
-else:
-    usage()
-    sys.exit()
 
-try:
-    f = open(inventoryFile);
-except:
-    print "Error while opening file %s" %inventoryFile
-    sys.exit(-1)
+    # Open collection
+    capa_col = openCollection(inventoryFile)
 
-count = 0
-line_num = 0
-col = []
-
-try:
-    val, ext = parseString(targetValueSt)
-    targetValue = tranformValue(val, ext)
-except:
-    print "Target value syntax error"
-
-
-result = [-1] * nbIter
-for line in f:
-    line_num += 1
+    # Get target value
     try:
-        val, ext = parseString(line)
-        count += 1
-        valFarad = tranformValue(val, ext)
-        col.append((valFarad, "%f %s"%(val,ext)))
+        val, ext = parseString(targetValueSt)
+        targetValue = tranformValue(val, ext)
     except:
-        print"error while parsing line %d" % line_num
+        print "Target value syntax error"
+
+    # Calculate best association
+    result = getAssociation(targetValue, capa_col)
+
+    # Print result
+    totalCap = calculate(result, capa_col)
+    print "Total value:", smartPrint(totalCap, "F")
+
+    nb = 0
+    for i in range(0, nbIter):
+        if result[i] != -1:
+            nb += 1
+            print "capa %d: %s" %(nb, capa_col[result[i]][1])
 
 
-
-tmpRes = list(result)
-iterate(0, tmpRes)
-
-
-totalCap = calculate(result)
-if totalCap >= 1:
-    print "Total value: %f F"%totalCap
-elif totalCap >= 0.001:
-    print "Total value: %f mF"%(totalCap*1000)
-elif totalCap >= 0.000001:
-    print "Total value: %f uF"%(totalCap*1000000)
-elif totalCap >= 0.000000001:
-    print "Total value: %0.3f nF"%(totalCap*1000000000)
-elif totalCap >= 0.000000000001:
-    print "Total value: %f pF"%(totalCap*1000000000000)
-
-nb = 0
-for i in range(0, nbIter):
-    if result[i] != -1:
-        nb += 1
-        print "capa %d: %s" %(nb, col[result[i]][1])
-
-
-
+if __name__ == "__main__":
+    main()
