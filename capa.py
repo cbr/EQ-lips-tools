@@ -35,9 +35,9 @@ def parseString(st):
 # Calculate value by adding value of given index
 def calculate(listIndex, capa_col):
     res=0
-    for i in range(0, len(listIndex)):
-        if listIndex[i] != -1:
-            res += capa_col[listIndex[i]][0]
+    for val in listIndex:
+        if val != -1:
+            res += capa_col[val][0]
     return res
 
 def iterate(targetValue, iterNum, bestListIndex, currentListIndex, capa_col):
@@ -112,6 +112,14 @@ def smartPrint(value, ext):
         stRes = "%f p%s"%(value*1000000000000, ext)
     return stRes
 
+def printAssociation(associationResult, capa_col):
+    nb = 0
+    for i in range(0, nbIter):
+        if associationResult[i] != -1:
+            nb += 1
+            print "capa %d: %s" %(nb, capa_col[associationResult[i]][1])
+
+
 def main():
     global inventoryFile
     global nbIter
@@ -153,12 +161,7 @@ def main():
     totalCap = calculate(result, capa_col)
     print "Total value:", smartPrint(totalCap, "F")
 
-    nb = 0
-    for i in range(0, nbIter):
-        if result[i] != -1:
-            nb += 1
-            print "capa %d: %s" %(nb, capa_col[result[i]][1])
-
+    printAssociation(result, capa_col)
 
 if __name__ == "__main__":
     main()
