@@ -38,31 +38,12 @@ def calc(F0, Q, GdB):
 
 
     # Standard result
-    F0=1/(2*PI*math.sqrt(R*RL*CL_real*CF_real))
-    Q_res=math.sqrt((R*CL_real)/(RL*CF_real))
+    F01=1/(2*PI*math.sqrt(R*RL*CL_real*CF_real))
+    Q1=math.sqrt((R*CL_real)/(RL*CF_real))
     print
     print "R=", R
-    print "F0=", F0, "Q=", Q_res
+    print "F0=", F01, "Q=", Q1
 
-    # Adjusted result (R is recalculated from Q formula with real capa values)
-    R_adjust=Q*Q*(RL*CF_real)/CL_real
-    F02=1/(2*PI*math.sqrt(R_adjust*RL*CL_real*CF_real))
-    Q2=math.sqrt((R_adjust*CL_real)/(RL*CF_real))
-    print
-    print "R_adjust", R_adjust
-    print "F0=", F02, "Q=", Q2
-
-
-
-
-# Open collection
-capa_col = openCollection("../../all_capa.txt")
-#capa_col = openCollection(inventoryFile)
-
-calc(250, 1.6, 18)
-calc(500, 1.6, 18)
-calc(1000, 1.6, 18)
-calc(2000, 1.6, 18)
-calc(4000, 1.6, 18)
-
-
+print
+print ">>>"
+print "250 Hz and 1000 Hz are not very good"
