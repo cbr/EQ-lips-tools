@@ -1,23 +1,25 @@
 import matplotlib.pyplot as pp
 import numpy as np
 
+# Draw gain of filter given its Pot value (P2) R1 and RL
+
 a = np.arange(-0.01, 1.01, 0.01)
 
-P2 = 25000.0
-R0 = 4700.0
-R1 = 32618.0
+P2 = 10000.0
+RL = 470.0
+R1 = 3300.0
 R2 = R1
 
-y = 20*np.log10(( R0 + a*(R1 + (1-a)*P2))/( R0 + (1-a)*(R2+a*P2) ))
+y = 20*np.log10(( RL + a*(R1 + (1-a)*P2))/( RL + (1-a)*(R2+a*P2) ))
 
-print y
+#print y
 pp.plot(a, y, "-")
 a=0
-print (( R0 + a*(R1 + (1-a)*P2))/( R0 + (1-a)*(R2+a*P2) ))
-print (R0+R1)/R0
+#print (( RL + a*(R1 + (1-a)*P2))/( RL + (1-a)*(R2+a*P2) ))
+print "Gain max =", 20*np.log10((RL+R1)/RL)
 a=1
-print (( R0 + a*(R1 + (1-a)*P2))/( R0 + (1-a)*(R2+a*P2) ))
-print R0/(R0+R2)
+#print (( RL + a*(R1 + (1-a)*P2))/( RL + (1-a)*(R2+a*P2) ))
+print "Gain min =", 20*np.log10(RL/(RL+R2))
 
 
 pp.show()
