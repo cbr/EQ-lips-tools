@@ -5,8 +5,8 @@ import math
 from capa import *
 
 #F0=250
-#Q=1.6
-#GdB=18
+QCommon=1.6
+GCommon=18
 
 
 RL=470
@@ -43,6 +43,22 @@ def calc(F0, Q, GdB):
     print
     print "R=", R
     print "F0=", F01, "Q=", Q1
+
+# Open collection
+capa_col = openCollection("../../all_capa.txt")
+
+
+
+calc(32, QCommon, GCommon)
+calc(64, QCommon, GCommon)
+calc(125, QCommon, GCommon)
+calc(250, QCommon, GCommon)
+calc(500, QCommon, GCommon)
+calc(1000, QCommon, GCommon)
+calc(2000, QCommon, GCommon)
+calc(4000, QCommon, GCommon)
+calc(8000, QCommon, GCommon)
+calc(16000, QCommon, GCommon)
 
 print
 print ">>>"
