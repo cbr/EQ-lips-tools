@@ -117,7 +117,7 @@ def printAssociation(associationResult, capa_col):
     for i in range(0, nbIter):
         if associationResult[i] != -1:
             nb += 1
-            print "capa %d: %s" %(nb, capa_col[associationResult[i]][1])
+            print "capa %d: %s (%s)" %(nb, smartPrint(capa_col[associationResult[i]][0], 'F'), capa_col[associationResult[i]][1])
 
 
 def main():
