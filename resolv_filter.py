@@ -1,11 +1,21 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
+
+# This script calculates needed capacitors for each band-pass filter
+# of an equalizer. It first calculates theorical capacitors value,
+# then it picks some capacitors from a list of 'real' capacitor value
+# and associate them to obtain the closest value.
+#
+# Computation is based on fixed resistances values (RL and R)
+#
+# See end of file to change the definition of each band-pass filter
 
 import math
 
 from capa import *
 
-#F0=250
+# Common Q value for all band-pass filters
 QCommon=1.6
+# Common Gain value for all band-pass filters
 GCommon=18
 
 
@@ -16,9 +26,9 @@ PI=3.1415926
 
 def calc(F0, Q, GdB):
     print
-    print "###############################"
-    print "### freq=", F0, "Q=", Q, "GdB=", GdB
-    print "###############################"
+    print "###############################################"
+    print "### Freq =", F0, "Hz   Q =", Q, "    Gain =", GdB, " dB"
+    print "###############################################"
     CL_theo=Q/(2*PI*F0*R)
     CF_theo=1/(2*PI*F0*Q*RL)
     R1=RL*(math.exp(GdB*math.log(10)/20)-1)
@@ -44,11 +54,11 @@ def calc(F0, Q, GdB):
     print "R=", R
     print "F0=", F01, "Q=", Q1
 
-# Open collection
-capa_col = openCollection("../../all_capa.txt")
+# Open capa collection
+capa_col = openCollection("capa_col/all_capa.txt")
 
 
-
+# Definition of all pass-band filters
 calc(32, QCommon, GCommon)
 calc(64, QCommon, GCommon)
 calc(125, QCommon, GCommon)
@@ -60,6 +70,3 @@ calc(4000, QCommon, GCommon)
 calc(8000, QCommon, GCommon)
 calc(16000, QCommon, GCommon)
 
-print
-print ">>>"
-print "250 Hz and 1000 Hz are not very good"

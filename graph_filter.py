@@ -1,7 +1,11 @@
+#!/usr/bin/env python2
+
 import matplotlib.pyplot as pp
 import numpy as np
 
-# Draw gain of filter given its Pot value (P2) R1 and RL
+# Draw gain of filter given its Pot value (P2) R1 and RL. It shows the
+# shape of the gain according to pot position. It enables to analyze
+# the linearity of the gain given various parameters.
 
 a = np.arange(-0.01, 1.01, 0.01)
 
